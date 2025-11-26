@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肖翔 - 个人学术网页</title>
+    <script src="https://cdn.tailwindcss.com/3.3.3"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            scroll-behavior: smooth;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            background-color: #1a365d;
+            transition: all 0.3s ease;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .navbar a {
+            color: white;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #4a6fa5;
+        }
+
+        /* 主色调按钮 */
+        .btn-primary {
+            background-color: #1a365d;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #4a6fa5;
+            transform: translateY(-2px);
+        }
+
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 时间线样式 */
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background-color: #4a6fa5;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+        }
+
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border: 4px solid #1a365d;
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .left {
+            left: 0;
+        }
+
+        .right {
+            left: 50%;
+        }
+
+        .left::after {
+            right: -10px;
+        }
+
+        .right::after {
+            left: -10px;
+        }
+
+        .timeline-content {
+            padding: 20px;
+            background-color: white;
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 返回顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #1a365d;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 999;
+            transform: translateY(20px);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            background-color: #4a6fa5;
+        }
+
+        /* 论文引用块 */
+        .paper-citation {
+            background-color: #f1f5f9;
+            border-left: 4px solid #4a6fa5;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* 论文图片样式 */
+        .paper-image {
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .paper-image:hover {
+            transform: scale(1.05);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+        
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            margin-top: 2%;
+        }
+        
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* 响应式设计 */
+        @media screen and (max-width: 768px) {
+            .timeline::after {
+                left: 31px;
+            }
+
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+
+            .timeline-item::after {
+                left: 21px;
+            }
+
+            .left::after, .right::after {
+                left: 21px;
+            }
+
+            .right {
+                left: 0%;
+            }
+
+            .navbar-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        @media screen and (min-width: 769px) {
+            .mobile-menu-btn {
+                display: none;
+            }
+        }
+
+        /* 移动端菜单 */
+        .mobile-menu {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background-color: #1a365d;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            z-index: 999;
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-menu a:hover {
+            background-color: #4a6fa5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar py-4 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-white text-xl font-bold">肖翔-申博简历</div>
+            <div class="navbar-links hidden md:flex space-x-8">
+                <a href="#home" class="hover:text-blue-300 transition-colors">首页</a>
+                <a href="#education" class="hover:text-blue-300 transition-colors">教育背景</a>
+                <a href="#research" class="hover:text-blue-300 transition-colors">科研成果</a>
+                <a href="#awards" class="hover:text-blue-300 transition-colors">荣誉奖励</a>
+            </div>
+            <button class="mobile-menu-btn text-white focus:outline-none" id="mobileMenuBtn">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 移动端菜单 -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#home">首页</a>
+        <a href="#education">教育背景</a>
+        <a href="#research">科研成果</a>
+        <a href="#awards">荣誉奖励</a>
+    </div>
+
+    <!-- 顶部横幅 -->
+    <header id="home" class="pt-24 pb-16 px-6 bg-gradient-to-r from-blue-900 to-blue-700 text-white">
+        <div class="container mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">肖翔</h1>
+            <p class="text-xl md:text-2xl mb-6">湖南科技大学 | 给排水科学与工程/市政工程</p>
+            <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">研究方向：超声抑藻、光催化除藻、水污染控制</p>
+            <div class="flex justify-center space-x-4">
+                <a href="mailto:xincerexiao@163.com" class="bg-white text-blue-900 px-6 py-3 rounded-lg font-medium hover:bg-blue-50 transition-colors">
+                    <i class="fas fa-envelope mr-2"></i>联系我
+                </a>
+                <a href="https://orcid.org/0009-0005-5533-9612" target="_blank" class="border-2 border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-blue-900 transition-colors">
+                    <i class="fab fa-orcid mr-2"></i>ORCID
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 个人简介 -->
+    <section class="py-16 px-6 bg-white">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-3xl font-bold mb-8 text-center text-blue-900">个人简介</h2>
+            <div class="flex flex-col md:flex-row items-center gap-8">
+                <div class="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-blue-900 shadow-lg">
+                    <img src="https://mmbiz.qpic.cn/mmbiz_jpg/Wj2qwXEPnMXnOah9Qpo9EYWlEKYkjQATjLNKIib3H0pSlwFzyiaUcRydEuFnFZnghnWRJmIf50aicKOBia0tsKRefg/640?wx_fmt=jpeg&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1#imgIndex=2/" alt="肖翔照片" class="w-full h-full object-cover">
+                </div>
+                <div class="text-lg text-gray-700 leading-relaxed">
+                    <p class="mb-4">肖翔，湖南科技大学土木工程学院给排水科学与工程专业本科、土木工程（市政工程方向）硕士，主要从事超声抑藻、光催化除藻技术研究。</p>
+                    <p class="mb-4">在硕士期间以第一作者在Journal of Environmental Management发表综述论文1篇（IF=8.4），参与发表中科院一区TOP期刊论文2篇（IF=11.3, 10.0），参与湖南省自然科学基金青年项目和湖南省教育厅优秀项目各1项。</p>
+                    <p>2023-2024年度获得研究生国家奖学金，被评为湖南科技大学优秀研究生、2025届优秀毕业生，毕业论文获评优秀毕业论文。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 教育背景 -->
+    <section id="education" class="py-16 px-6 bg-gray-50">
+        <div class="container mx-auto max-w-5xl">
+            <h2 class="text-3xl font-bold mb-12 text-center text-blue-900">教育背景</h2>
+            
+            <!-- 时间线 -->
+            <div class="timeline">
+                <!-- 硕士阶段 -->
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-blue-900">湖南科技大学 | 土木工程</h3>
+                            <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">2022.09 - 2025.06</span>
+                        </div>
+                        <p class="text-gray-700 mb-2">硕士研究生 | 市政工程方向</p>
+                        <p class="text-gray-600">GPA: 3.70/4.0</p>
+                        <p class="text-gray-600 mt-3">学位论文：《卤氧化物@AgI 光催化/活化过硫酸盐除藻特性及机理研究》</p>
+                    </div>
+                </div>
+                
+                <!-- 本科阶段 -->
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-blue-900">湖南科技大学 | 给排水科学与工程</h3>
+                            <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">2018.09 - 2022.06</span>
+                        </div>
+                        <p class="text-gray-700 mb-2">本科 | 工学学士</p>
+                        <p class="text-gray-600">GPA: 2.75/4.0</p>
+                        <p class="text-gray-600 mt-3">主要课程：水力学、水处理工程、环境监测、水资源利用与保护</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 科研成果 -->
+    <section id="research" class="py-16 px-6 bg-white">
+        <div class="container mx-auto max-w-5xl">
+            <h2 class="text-3xl font-bold mb-12 text-center text-blue-900">科研成果</h2>
+            
+            <!-- 研究方向 -->
+            <div class="mb-16">
+                <h3 class="text-2xl font-bold mb-6 text-blue-800">研究方向</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 超声抑藻技术 -->
+                    <div class="card p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-900 mr-4">
+                                <i class="fas fa-wave-square text-xl"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-blue-900">超声抑藻技术</h4>
+                        </div>
+                        <p class="text-gray-700 mb-4">研究超声辐射对铜绿微囊藻细胞的生理特性影响，通过全转录组实验分析代谢通路、信号通路等差异表达基因，明确藻细胞在亚致死状态下的分子生物学机理。</p>
+                        <p class="text-gray-700">研究超声预处理强化去除鱼腥藻的特点和机理，分析中试实验中超声预处理对增强常规水处理工艺及减少消毒副产物生成的机理。</p>
+                    </div>
+                    
+                    <!-- 光催化除藻技术 -->
+                    <div class="card p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-900 mr-4">
+                                <i class="fas fa-lightbulb text-xl"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-blue-900">光催化除藻技术</h4>
+                        </div>
+                        <p class="text-gray-700 mb-4">通过调查卤素组成制备BiOX基复合光催化剂，通过表征手段深入探究光生电子-空穴对的分离、迁移和对藻细胞生物活性损伤机理。</p>
+                        <p class="text-gray-700">研究光催化/活化过硫酸盐除藻特性及机理，开发高效的光催化除藻体系。</p>
+                    </div>
+                </div>
+            </div>
+            
+<!-- 论文 -->
+<div class="mb-16">
+    <h3 class="text-2xl font-bold mb-6 text-blue-800">代表性论文</h3>
+    
+    <!-- 论文列表 -->
+    <div class="space-y-8">
+        <!-- 论文1 -->
+        <div class="paper-citation">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-1/3">
+                    <div class="paper-image-container overflow-hidden rounded-lg shadow-md">
+                        <img 
+                            src="https://ars.els-cdn.com/content/image/1-s2.0-S0301479723022983-gr2_lrg.jpg" 
+                            alt="论文1图片" 
+                            class="paper-image w-full h-48 object-cover cursor-pointer"
+                            onclick="openModal(this.src)"
+                        >
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2 text-center">点击图片查看大图</p>
+                </div>
+                <div class="md:w-2/3">
+                    <p class="mb-2"><strong>Xiang xiao</strong>, Yazhou Peng，...，Saijun Zhou. Current status and prospects of algal bloom early warning technologies: A Review[J]. Journal of Environmental Management, Volume 349, 1 January 2024, 119510. <span class="text-blue-800">IF: 8.6 (中科院二区TOP)</span></p>
+                    <a href="https://doi.org/10.1016/j.jenvman.2023.119510" target="_blank" class="text-blue-600 hover:text-blue-800 inline-flex items-center">
+                        <i class="fas fa-link mr-1"></i> DOI: https://doi.org/10.1016/j.jenvman.2023.119510
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 论文2 -->
+        <div class="paper-citation">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-1/3">
+                    <div class="paper-image-container overflow-hidden rounded-lg shadow-md">
+                        <img 
+                            src="https://ars.els-cdn.com/content/image/1-s2.0-S0959652624009697-ga1_lrg.jpg" 
+                            alt="论文2图片" 
+                            class="paper-image w-full h-48 object-cover cursor-pointer"
+                            onclick="openModal(this.src)"
+                        >
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2 text-center">点击图片查看大图</p>
+                </div>
+                <div class="md:w-2/3">
+                    <p class="mb-2">Yazhou Peng, <strong>Xiang Xiao</strong>,...,Wei Zhang. Removal of Anabaena by ultrasonic pretreatment enhancing-coagulation and water treatment processes[J]. Journal of Cleaner Production. Volume 447, 1 April 2024, 141521. <span class="text-blue-800">IF: 10.0 (中科院一区)</span></p>
+                    <a href="https://doi.org/10.1016/j.jclepro.2024.141521" target="_blank" class="text-blue-600 hover:text-blue-800 inline-flex items-center">
+                        <i class="fas fa-link mr-1"></i> DOI: https://doi.org/10.1016/j.jclepro.2024.141521
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 论文3 -->
+        <div class="paper-citation">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-1/3">
+                    <div class="paper-image-container overflow-hidden rounded-lg shadow-md">
+                        <img 
+                            src="https://ars.els-cdn.com/content/image/1-s2.0-S0304389424003212-ga1_lrg.jpg" 
+                            alt="论文3图片" 
+                            class="paper-image w-full h-48 object-cover cursor-pointer"
+                            onclick="openModal(this.src)"
+                        >
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2 text-center">点击图片查看大图</p>
+                </div>
+                <div class="md:w-2/3">
+                    <p class="mb-2">Yazhou Peng, <strong>Xiang Xiao</strong>,... ,Guocheng Zhu. Biological activity and molecular mechanism of inactivation of Microcystis aeruginosa by ultrasound irradiation[J]. Journal of Hazardous Materials, Volume 468, 15 April 2024, 133742. <span class="text-blue-800">IF: 11.3 (中科院一区)</span></p>
+                    <a href="https://doi.org/10.1016/j.jhazmat.2024.133742" target="_blank" class="text-blue-600 hover:text-blue-800 inline-flex items-center">
+                        <i class="fas fa-link mr-1"></i> DOI: https://doi.org/10.1016/j.jhazmat.2024.133742
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            
+            <!-- 专利 -->
+            <div class="mb-16">
+                <h3 class="text-2xl font-bold mb-6 text-blue-800">申请专利</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 专利1 -->
+                    <div class="card p-6">
+                        <h4 class="text-lg font-bold text-blue-900 mb-2">一种超声和氯氧化协同预处理藻细胞失活的装置</h4>
+                        <p class="text-gray-700 mb-2">专利号：受理中，申请号：2024222261652</p>
+                        <p class="text-gray-700 mb-2">授权日期：2023.05.12</p>
+                        <p class="text-gray-600">发明人：彭亚洲,<strong>肖翔</strong>, 贺宇航等</p>
+                    </div>
+                                       
+                </div>
+            </div>
+            
+            <!-- 参与项目 -->
+            <div>
+                <h3 class="text-2xl font-bold mb-6 text-blue-800">参与科研项目</h3>
+                
+                <div class="space-y-6">
+                    <!-- 项目1 -->
+                    <div class="card p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-lg font-bold text-blue-900">湖南省自然科学基金青年项目：基于藻细胞亚致死损伤的低频超声抑藻效能及分子生物学机理研究</h4>
+                            <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">2023-2026</span>
+                        </div>
+                        <p class="text-gray-700 mb-2">项目编号：2022JJ40151</p>
+                        <p class="text-gray-700 mb-2">项目负责人：彭亚洲</p>
+                        <p class="text-gray-700 mb-2">主要参与人</p>
+                        <p class="text-gray-600">研究内容：系统研究超声与光催化的协同作用机制，开发高效的超声-光催化协同除藻技术，为蓝藻水华控制提供新方法。</p>
+                    </div>
+                    
+                    <!-- 项目2 -->
+                    <div class="card p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="text-lg font-bold text-blue-900">湖南省教育厅优青项目：超声/预氯化协同作用下亚致死损伤藻细胞的混凝机理及安全性研究</h4>
+                            <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">2021-2023</span>
+                        </div>
+                        <p class="text-gray-700 mb-2">项目编号：24B164</p>
+                        <p class="text-gray-700 mb-2">项目负责人：彭亚洲</p>
+                        <p class="text-gray-700 mb-2">资助金额：10万元</p>
+                        <p class="text-gray-600">研究内容：制备新型可见光响应光催化剂，研究其在水处理中的应用，特别是对藻类和有机污染物的去除效果。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 荣誉奖励 -->
+    <section id="awards" class="py-16 px-6 bg-gray-50">
+        <div class="container mx-auto max-w-5xl">
+            <h2 class="text-3xl font-bold mb-12 text-center text-blue-900">荣誉奖励</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 奖励1 -->
+                <div class="card p-6 flex items-start">
+                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 mr-4 flex-shrink-0">
+                        <i class="fas fa-award text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-blue-900 mb-2">国家奖学金</h3>
+                        <p class="text-gray-700 mb-2">中华人民共和国教育部</p>
+                        <p class="text-gray-600">2024年</p>
+                        <p class="text-gray-600 mt-3">奖励在硕士阶段取得优异成绩的研究生</p>
+                    </div>
+                </div>
+                
+                <!-- 奖励2 -->
+                <div class="card p-6 flex items-start">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4 flex-shrink-0">
+                        <i class="fas fa-trophy text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-blue-900 mb-2">湖南科技大学优秀硕士学位论文</h3>
+                        <p class="text-gray-700 mb-2">湖南科技大学</p>
+                        <p class="text-gray-600">2025年</p>
+                        <p class="text-gray-600 mt-3">表彰在硕士学位论文中取得创新性研究成果</p>
+                    </div>
+                </div>
+                
+                <!-- 奖励3 -->
+                <div class="card p-6 flex items-start">
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-4 flex-shrink-0">
+                        <i class="fas fa-medal text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-blue-900 mb-2">湖南科技大学优秀研究生</h3>
+                        <p class="text-gray-700 mb-2">湖南科技大学</p>
+                        <p class="text-gray-600">2024年</p>
+                        <p class="text-gray-600 mt-3">表彰在科研工作中表现突出的研究生</p>
+                    </div>
+                </div>
+                
+                <!-- 奖励4 -->
+                <div class="card p-6 flex items-start">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 mr-4 flex-shrink-0">
+                        <i class="fas fa-certificate text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-blue-900 mb-2">第十七届湖南省研究生创新论坛二等奖</h3>
+                        <p class="text-gray-700 mb-2">湖南省人民政府学位管理委员会办公室</p>
+                        <p class="text-gray-600">2021年</p>
+                        <p class="text-gray-600 mt-3">表彰在自然科学领域取得重要研究成果的学术论文</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- 页脚 -->
+<footer class="bg-blue-900 text-white py-10 px-6">
+    <div class="container mx-auto max-w-5xl">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-6 md:mb-0">
+                <h3 class="text-xl font-bold mb-2">肖翔 申博简历</h3>
+                <p class="text-blue-200">湖南科技大学 | 给排水科学与工程 | 市政工程</p>
+            </div>
+            <div class="flex space-x-6">
+                <!-- ORCID -->
+                <a href="https://orcid.org/0009-0005-5533-9612" target="_blank" class="text-white hover:text-blue-300 transition-colors">
+                    <i class="fab fa-orcid text-2xl"></i>
+                </a>
+                <!-- 邮箱 -->
+                <a href="mailto:xincerexiao@163.com" class="text-white hover:text-blue-300 transition-colors">
+                    <i class="fas fa-envelope text-2xl"></i>
+                </a>
+                <!-- 电话 -->
+                <a href="tel:17763752972" class="text-white hover:text-blue-300 transition-colors">
+                    <i class="fas fa-phone text-2xl"></i>
+                </a>
+                <!-- 谷歌学术 -->
+                <a href="https://scholar.google.com/citations?user=fEzR7VEAAAAJ&hl=zh-CN" target="_blank" class="text-white hover:text-blue-300 transition-colors">
+                    <i class="fab fa-google-scholar text-2xl"></i>
+                </a>
+            </div>
+        </div>
+        <div class="border-t border-blue-800 mt-8 pt-8 text-center text-blue-200">
+            <p>© 2024 肖翔个人学术信息网页 | <a href="https://mp.weixin.qq.com/s?__biz=MzI2NjU0NzkzMw==&mid=2247536219&idx=1&sn=9c53123fd41dc355d107cb7c9eafa95b&chksm=ea8e69e9ddf9e0ffecb8505d87213923d99fab70d8176c7321bb334f5fb925881a496bfb1433&scene=27" class="hover:text-white">created by xincere xiao</a></p>
+            <p class="mt-2 text-sm">页面内容均本人编写，仅供参考</p>
+        </div>
+    </div>
+</footer>
+
+    <!-- 图片模态框 -->
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <!-- 返回顶部按钮 -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // 移动端菜单切换
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', function() {
+            mobileMenu.classList.toggle('active');
+        });
+        
+        // 点击移动端菜单链接后关闭菜单
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+            });
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // 返回顶部按钮
+        const backToTopBtn = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+        
+        backToTopBtn.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // 导航栏滚动效果
+        const navbar = document.querySelector('.navbar');
+        
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 50) {
+                navbar.classList.add('py-2');
+                navbar.classList.remove('py-4');
+                navbar.classList.add('shadow-md');
+            } else {
+                navbar.classList.add('py-4');
+                navbar.classList.remove('py-2');
+                navbar.classList.remove('shadow-md');
+            }
+        });
+        
+        // 图片模态框功能
+        function openModal(src) {
+            document.getElementById('imageModal').style.display = 'block';
+            document.getElementById('modalImage').src = src;
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // 点击模态框外部区域关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
